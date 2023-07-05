@@ -7,6 +7,22 @@
 using namespace std;
 
 vector<string> badbytes;
+vector<string> processNames = { "gmod.exe", "hl2.exe" };
+vector<string> bytesValues = {
+    "exechack",
+    "urbanichka", // этот овощ вставляет свой ник во всякий шлак что высирает, так что мне похуй
+    "onetap",
+    "aimbot",
+    "memoriam",
+    "neverpivo",
+    "ub3rhag",
+    "Lemi",
+    "LeeCheat",
+    "smeghack",
+    "oink.industrias",
+    "scripthook",
+    "antiaim",
+};
 
 void FindBytes(const vector<string>& processNames, const vector<string>& bytesValues) {
 
@@ -59,23 +75,6 @@ void FindBytes(const vector<string>& processNames, const vector<string>& bytesVa
 }
 
 int main() {
-        vector<string> processNames = { "gmod.exe", "hl2.exe" };
-        vector<string> bytesValues = {
-            "exechack",
-            "urbanichka", // этот овощ вставляет свой ник во всякий шлак что высирает, так что мне похуй
-            "onetap",
-            "aimbot",
-            "memoriam",
-            "neverpivo",
-            "ub3rhag",
-            "Lemi",
-            "LeeCheat",
-            "smeghack",
-            "oink.industrias",
-            "scripthook",
-            "antiaim",
-        };
-
     FindBytes(processNames, bytesValues);
     system("pause");
     return 0;
