@@ -10,7 +10,7 @@ vector<string> badbytes;
 vector<string> processNames = { "gmod.exe", "hl2.exe" };
 vector<string> bytesValues = {
     "exechack",
-    "urbanichka", // этот овощ вставляет свой ник во всякий шлак что высирает, так что мне похуй
+    "urbanichka",
     "onetap",
     "aimbot",
     "memoriam",
@@ -24,21 +24,29 @@ vector<string> bytesValues = {
     "antiaim",
 };
 
-void FindBytes(const vector<string>& processNames, const vector<string>& bytesValues) {
+bool IsProcessNameMatch(const wstring& processName, const string& targetName) {
+    wstring targetNameW(targetName.begin(), targetName.end());
+    return (processName == targetNameW);
+}
 
+void FindBytes(const vector<string>& processNames, const vector<string>& bytesValues) {
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (snapshot == INVALID_HANDLE_VALUE) return;
+    if (snapshot == INVALID_HANDLE_VALUE) {
+        return;
+    }
 
     PROCESSENTRY32W entry;
     entry.dwSize = sizeof(PROCESSENTRY32W);
 
-    HANDLE processHandle = NULL;
     if (Process32FirstW(snapshot, &entry)) {
         do {
+            wstring processNameW(entry.szExeFile);
+
             for (const string& processName : processNames) {
-                if (wstring(entry.szExeFile) == wstring(processName.begin(), processName.end())) {
+                if (IsProcessNameMatch(processNameW, processName)) {
                     cout << "[+] Starting, wait..." << endl;
-                    processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, entry.th32ProcessID);
+
+                    HANDLE processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, entry.th32ProcessID);
                     if (processHandle != NULL) {
                         MEMORY_BASIC_INFORMATION mbi;
                         SIZE_T bytesRead;
@@ -52,7 +60,9 @@ void FindBytes(const vector<string>& processNames, const vector<string>& bytesVa
 
                                     for (const auto& bytesValue : bytesValues) {
                                         if (bufferString.find(bytesValue) != string::npos) {
-                                            if (find(badbytes.begin(), badbytes.end(), bytesValue) != badbytes.end()) break;
+                                            if (find(badbytes.begin(), badbytes.end(), bytesValue) != badbytes.end()) {
+                                                break;
+                                            }
                                             cout << "find: " << bytesValue << endl;
                                             badbytes.push_back(bytesValue);
                                         }
@@ -63,14 +73,13 @@ void FindBytes(const vector<string>& processNames, const vector<string>& bytesVa
                         }
 
                         CloseHandle(processHandle);
-                        CloseHandle(snapshot);
                     }
                 }
             }
 
         } while (Process32NextW(snapshot, &entry));
-        return;
     }
+
     CloseHandle(snapshot);
 }
 
