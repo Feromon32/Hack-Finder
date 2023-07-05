@@ -62,7 +62,7 @@ int main() {
         vector<string> processNames = { "gmod.exe", "hl2.exe" };
         vector<string> bytesValues = {
             "exechack",
-            "urbanichka",
+            "urbanichka", // этот овощ вставляет свой ник во всякий шлак что высирает, так что мне похуй
             "onetap",
             "aimbot",
             "memoriam",
