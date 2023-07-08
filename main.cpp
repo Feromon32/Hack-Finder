@@ -7,20 +7,45 @@
 using namespace std;
 
 vector<string> badbytes;
+vector<string> processNames = { "gmod.exe", "hl2.exe" };
+vector<string> bytesValues = {
+    "exechack",
+    "urbanichka",
+    "onetap",
+    "aimbot",
+    "memoriam",
+    "neverpivo",
+    "ub3rhag",
+    "Lemi",
+    "LeeCheat",
+    "smeghack",
+    "oink.industrias",
+    "scripthook",
+    "antiaim",
+};
+
+bool IsProcessNameMatch(const wstring& processName, const string& targetName) {
+    wstring targetNameW(targetName.begin(), targetName.end());
+    return (processName == targetNameW);
+}
 
 void FindBytes(const vector<string>& processNames, const vector<string>& bytesValues) {
+    cout << "[+] Starting, wait..." << endl;
 
     HANDLE snapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
-    if (snapshot == INVALID_HANDLE_VALUE) return;
+    if (snapshot == INVALID_HANDLE_VALUE) {
+        return;
+    }
 
     PROCESSENTRY32W entry;
     entry.dwSize = sizeof(PROCESSENTRY32W);
 
     if (Process32FirstW(snapshot, &entry)) {
         do {
+            wstring processNameW(entry.szExeFile);
+
             for (const string& processName : processNames) {
-                if (wstring(entry.szExeFile) == wstring(processName.begin(), processName.end())) { // It's faster, too.
-                    cout << "[+] Starting, wait..." << endl;
+                if (IsProcessNameMatch(processNameW, processName)) {
                     HANDLE processHandle = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, entry.th32ProcessID);
                     if (processHandle != NULL) {
                         MEMORY_BASIC_INFORMATION mbi;
@@ -35,7 +60,9 @@ void FindBytes(const vector<string>& processNames, const vector<string>& bytesVa
 
                                     for (const auto& bytesValue : bytesValues) {
                                         if (bufferString.find(bytesValue) != string::npos) {
-                                            if (find(badbytes.begin(), badbytes.end(), bytesValue) != badbytes.end()) break;
+                                            if (find(badbytes.begin(), badbytes.end(), bytesValue) != badbytes.end()) {
+                                                break;
+                                            }
                                             cout << "find: " << bytesValue << endl;
                                             badbytes.push_back(bytesValue);
                                         }
@@ -46,34 +73,17 @@ void FindBytes(const vector<string>& processNames, const vector<string>& bytesVa
                         }
 
                         CloseHandle(processHandle);
-                        CloseHandle(snapshot);
                     }
                 }
             }
 
         } while (Process32NextW(snapshot, &entry));
-        return; // it makes no sense to check other processes, the main logic comes from the main thread and implementing the dll in other subprocesses will not work
     }
+
     CloseHandle(snapshot);
 }
 
 int main() {
-    vector<string> processNames = { "gmod.exe", "hl2.exe" }; // works faster by about a 1.3 sec
-    vector<string> bytesValues = {
-        "exechack",
-        "urbanichka",
-        "onetap",
-        "aimbot",
-        "memoriam",
-        "neverpivo",
-        "ub3rhag",
-        "Lemi",
-        "LeeCheat",
-        "smeghack",
-        "oink.industrias",
-        "scripthook",
-        "antiaim",
-    };
     FindBytes(processNames, bytesValues);
     system("pause");
     return 0;
