@@ -30,6 +30,3 @@ To compile and run this code, you need the following:
 # License
 This code is released under the [MIT License](https://opensource.org/license/mit/). Feel free to modify and distribute it according to the terms of the license.
 For any questions or issues, please open an issue in this repository
-
-
-**Python Ref (Works only on windows, bcs of the modules): https://github.com/lauxov/gmod-anticheat**
