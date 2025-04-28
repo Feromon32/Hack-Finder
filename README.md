@@ -18,7 +18,7 @@ A C++ utility for searching specific byte patterns in the memory of target Windo
 - Includes essential Windows API, vector, and string headers
 - Defines target process names and byte patterns
 - Implements utility function for process name matching
-- Provides `FindBytes` function to scan process memory for byte patterns
+- Provides `Scan` function to scan process memory for byte patterns
 - Manages process handles and memory reading via Windows API
 - Stores results in a vector and closes handles properly
 
